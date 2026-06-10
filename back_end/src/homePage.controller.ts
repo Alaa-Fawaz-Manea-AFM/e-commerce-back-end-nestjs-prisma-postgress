@@ -1,12 +1,14 @@
+import AuthDecorator from './decorator/auth.decorator';
 import { Controller, Get, Res } from '@nestjs/common';
-import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import type { Response } from 'express';
 import * as os from 'os';
 
 @Controller('')
 export class HomeController {
   constructor(private configService: ConfigService) {}
 
+  @AuthDecorator()
   @Get()
   getDocs(@Res() res: Response) {
     const nonce = res.locals.nonce;
