@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  user
+  admin
+}
+
+model User {
+  id         String @id @default(uuid())
+  name       String
+  email      String @unique
+  password   String
+  cartCounts Int    @default(0)
+  role       Role   @default(user)
+
+  productCounts Int @default(0)
+
+  products Product[]
+  carts    Cart[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id       String @id @default(uuid())
+  category String @unique
+
+  product Product[]
+}
+
+model Product {
+  id     String @id @default(uuid())
+  userId String
+
+  categoryId String
+
+  title      String
+  desc       String
+  price      Float
+  discount   Float
+  star       Float    @default(0)
+  imageCover String
+  images     String[]
+  createdAt  DateTime @default(now())
+
+  cart     Cart[]
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@unique([id, userId])
+}
+
+model Order {
+  id          String @id @default(uuid())
+  totalAmount Float
+
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id        String @id @default(uuid())
+  userId    String
+  productId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
